@@ -1,0 +1,4 @@
+apiVersion: v2
+name: pod-restart-notifier-operator
+description: A Kubernetes operator to notify on pod restarts via Discord
+version: 0.1.4

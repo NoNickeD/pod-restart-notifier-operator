@@ -1,0 +1,13 @@
+Thank you for installing the Pod Restart Notifier!
+
+1. To check the deployment:
+    $ kubectl get deployments -n {{ .Release.Namespace }} {{ .Release.Name }}
+
+2. To see the operator logs:
+    $ kubectl logs -n {{ .Release.Namespace }} -l app=pod-restart-notifier
+
+3. To verify the operator's functionality, you can induce a restart in a pod and then check the operator logs or your Discord channel for notifications.
+
+Remember, you should have your Discord webhook URL set up to receive the notifications. If you need to adjust the webhook, you can update the Helm release.
+
+Happy monitoring!

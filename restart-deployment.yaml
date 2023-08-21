@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: restart-deployment
+  namespace: test-notifier
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: restart-pod
+  template:
+    metadata:
+      labels:
+        app: restart-pod
+    spec:
+      containers:
+      - name: restart-container
+        image: busybox
+        command: ["/bin/sh"]
+        args: ["-c", "sleep 200; exit 0"]

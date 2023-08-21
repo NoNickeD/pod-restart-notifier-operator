@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: failing-pod
+  namespace: test-notifier
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: failing-app
+  template:
+    metadata:
+      labels:
+        app: failing-app
+    spec:
+      containers:
+      - name: failing-container
+        image: busybox
+        command:
+        - /bin/sh
+        - -c
+        - "exit 1"
