@@ -14,9 +14,17 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-const webhookURLEnvVar = "DISCORD_WEBHOOK_URL"
+const (
+	discordWebhookURLEnvVar = "DISCORD_WEBHOOK_URL"
+	teamsWebhookURLEnvVar   = "TEAMS_WEBHOOK_URL"
+	slackWebhookURLEnvVar   = "SLACK_WEBHOOK_URL"
+)
 
-var webhookURL string
+var (
+	discordWebhookURL string
+	teamsWebhookURL   string
+	slackWebhookURL   string
+)
 
 var podState = make(map[string]struct {
 	RestartCount int32
@@ -24,10 +32,9 @@ var podState = make(map[string]struct {
 })
 
 func main() {
-	webhookURL = os.Getenv(webhookURLEnvVar)
-	if webhookURL == "" {
-		log.Fatalf("Missing environment variable: %s", webhookURLEnvVar)
-	}
+	discordWebhookURL = os.Getenv(discordWebhookURLEnvVar)
+	teamsWebhookURL = os.Getenv(teamsWebhookURLEnvVar)
+	slackWebhookURL = os.Getenv(slackWebhookURLEnvVar)
 
 	http.HandleFunc("/healthz", healthz)
 	http.HandleFunc("/readyz", readyz)
@@ -99,17 +106,44 @@ func main() {
 
 func sendNotification(podName string, restartDifference int32) {
 	message := fmt.Sprintf("Pod %s has restarted %d times!", podName, restartDifference)
-	payload := fmt.Sprintf(`{"content": "%s"}`, message)
 
-	resp, err := http.Post(webhookURL, "application/json", strings.NewReader(payload))
-	if err != nil {
-		log.Fatalf("Error sending Discord message: %s", err.Error())
+	// Send to Discord
+	if discordWebhookURL != "" {
+		discordPayload := fmt.Sprintf(`{"content": "%s"}`, message)
+		postMessage(discordWebhookURL, discordPayload)
 	}
 
+	// Send to Microsoft Teams
+	if teamsWebhookURL != "" {
+		teamsPayload := fmt.Sprintf(`{
+			"@type": "MessageCard",
+			"@context": "http://schema.org/extensions",
+			"summary": "Pod Restart Notification",
+			"themeColor": "0078D7",
+			"text": "%s"
+		}`, message)
+		postMessage(teamsWebhookURL, teamsPayload)
+	}
+
+	// Send to Slack
+	if slackWebhookURL != "" {
+		slackPayload := fmt.Sprintf(`{
+			"text": "%s"
+		}`, message)
+		postMessage(slackWebhookURL, slackPayload)
+	}
+}
+
+func postMessage(url, payload string) {
+	resp, err := http.Post(url, "application/json", strings.NewReader(payload))
+	if err != nil {
+		log.Printf("Error sending message: %s", err.Error())
+		return
+	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
-		log.Fatalf("Failed to send Discord message with status code: %d", resp.StatusCode)
+		log.Printf("Failed to send message with status code: %d", resp.StatusCode)
 	}
 }
 

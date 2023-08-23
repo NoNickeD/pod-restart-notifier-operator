@@ -1,3 +1,10 @@
+---
+type: Git
+date: 2023
+Context: k8soperator
+Provider: localhost
+---
+
 ### Minikube
 
 Start a local Kubernetes cluster.
@@ -128,8 +135,16 @@ touch values.yaml
 ```yaml
 apiVersion: v2
 name: pod-restart-notifier
-description: A Kubernetes operator to notify on pod restarts via Discord
-version: 0.1.4
+description: A Helm chart for a Kubernetes operator that notifies on pod restarts via Discord, Microsoft Teams and Slack.
+type: application
+version: 0.1.5
+appVersion: 1.0.1
+maintainers:
+- name: Nikos Nikolakakis
+home: https://github.com/NoNickeD/pod-restart-notifier-operator
+sources:
+- https://github.com/NoNickeD/pod-restart-notifier-operator
+dependencies: []
 ```
 
 2. Set Up Default `values.yaml`:
@@ -137,16 +152,18 @@ version: 0.1.4
 This file will contain default values which users of the chart can override:
 
 ```yaml
-namespace: default
-
 image:
-  repository: <your_dockerhub_username>/pod-restart-notifier-operator
-  tag: 0.1.4
+  repository: nonickednn/pod-restart-notifier-operator
+  tag: 0.1.5
 
 discord:
-  webhookURL: "YOUR_DISCORD_WEBHOOK_URL"
+  webhookURL: "DISCORD_WEBHOOK_URL"
 
-resources: {}
+teams:
+  webhookURL: "TEAMS_WEBHOOK_URL"
+
+slack:
+  webhookURL: "SLACK_WEBHOOK_URL"
 ```
 
 Make sure to replace placeholders (`<your_dockerhub_username>` and `YOUR_DISCORD_WEBHOOK_URL`) with appropriate values.
@@ -225,6 +242,10 @@ spec:
         env:
         - name: DISCORD_WEBHOOK_URL
           value: "{{ .Values.discord.webhookURL }}"
+        - name: TEAMS_WEBHOOK_URL
+          value: "{{ .Values.teams.webhookURL }}"
+        - name: SLACK_WEBHOOK_URL
+          value: "{{ .Values.slack.webhookURL }}"
         resources:
           requests:
             memory: "64Mi"
@@ -257,9 +278,15 @@ Thank you for installing the Pod Restart Notifier!
 2. To see the operator logs:
     $ kubectl logs -n {{ .Release.Namespace }} -l app=pod-restart-notifier
 
-3. To verify the operator's functionality, you can induce a restart in a pod and then check the operator logs or your Discord channel for notifications.
+3. To verify the operator's functionality, you can induce a restart in a pod and then check the operator logs or your Discord channel, Microsoft Teams, or Slack for notifications.
 
-Remember, you should have your Discord webhook URL set up to receive the notifications. If you need to adjust the webhook, you can update the Helm release.
+Setup:
+- Ensure you have your Discord webhook URL set up to receive the notifications.
+- For Microsoft Teams, set up an incoming webhook connector in your Teams channel to get a webhook URL.
+- For Slack, create an incoming webhook from the "Apps" section in your Slack workspace to receive a webhook URL.
+
+Configuration:
+- If you need to adjust the webhook URLs, you can update the Helm release or modify the `values.yaml`.
 
 Happy monitoring!
 ```
@@ -389,16 +416,20 @@ Then, package and install:
 helm package ./pod-restart-notifier
 
 # Basic installation using the default values specified in the chart's values.yaml file.
-helm install pod-restart-notifier ./pod-restart-notifier-0.1.4.tgz
+helm install pod-restart-notifier ./pod-restart-notifier-0.1.5.tgz
 ```
 
 To override values during installation:
 
 ```bash
-helm install pod-restart-notifier ./pod-restart-notifier-0.1.4.tgz --set discord.webhookURL="ANOTHER_WEBHOOK_URL",namespace="your namespace"
+# Discord
+helm install pod-restart-notifier ./pod-restart-notifier-0.1.5.tgz --namespace "YOUR_NAMESPACE" --set discord.webhookURL="WEBHOOK_URL"
 
-helm install pod-restart-notifier ./pod-restart-notifier-0.1.4.tgz --set discord.webhookURL="
-https://discord.com/api/webhooks/1143146589075030047/OVg9glpBo2IwZbCboxM873s1mxOEflFdT34hfzbTdVx75RwMRuOVronrKW9FuepATwwP",namespace=test-notifier
+helm install pod-restart-notifier ./pod-restart-notifier-0.1.5.tgz --namespace=test-notifier --set discord.webhookURL="
+https://discord.com/api/webhooks/1143146589075030047/OVg9glpBo2IwZbCboxM873s1mxOEflFdT34hfzbTdVx75RwMRuOVronrKW9FuepATwwP"
+
+# Teams
+helm install pod-restart-notifier ./pod-restart-notifier-0.1.5.tgz --namespace "YOUR_NAMESPACE" --set teams.webhookURL="WEBHOOK_URL"
 ```
 
 The structure of  Helm chart must be the following:

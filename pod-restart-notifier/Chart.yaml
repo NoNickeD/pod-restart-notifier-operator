@@ -1,4 +1,12 @@
 apiVersion: v2
-name: pod-restart-notifier-operator
-description: A Kubernetes operator to notify on pod restarts via Discord
-version: 0.1.4
+name: pod-restart-notifier
+description: A Helm chart for a Kubernetes operator that notifies on pod restarts via Discord, Microsoft Teams and Slack.
+type: application
+version: 0.1.5
+appVersion: 1.0.1
+maintainers:
+- name: Nikos Nikolakakis
+home: https://github.com/NoNickeD/pod-restart-notifier-operator
+sources:
+- https://github.com/NoNickeD/pod-restart-notifier-operator
+dependencies: []

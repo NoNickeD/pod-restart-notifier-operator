@@ -2,9 +2,13 @@ namespace: default
 
 image:
   repository: nonickednn/pod-restart-notifier-operator
-  tag: 0.1.4
+  tag: 0.1.5
 
 discord:
-  webhookURL: "YOUR_DISCORD_WEBHOOK_URL"
+  webhookURL: "DISCORD_WEBHOOK_URL"
 
-resources: {}
+teams:
+  webhookURL: "TEAMS_WEBHOOK_URL"
+
+slack:
+  webhookURL: "SLACK_WEBHOOK_URL"

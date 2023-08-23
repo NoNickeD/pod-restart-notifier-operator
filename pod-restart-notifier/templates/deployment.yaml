@@ -25,6 +25,10 @@ spec:
         env:
         - name: DISCORD_WEBHOOK_URL
           value: "{{ .Values.discord.webhookURL }}"
+        - name: TEAMS_WEBHOOK_URL
+          value: "{{ .Values.teams.webhookURL }}"
+        - name: SLACK_WEBHOOK_URL
+          value: "{{ .Values.slack.webhookURL }}"
         resources:
           requests:
             memory: "64Mi"
