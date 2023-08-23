@@ -1,10 +1,3 @@
----
-type: Git
-date: 2023
-Context: k8soperator
-Provider: localhost
----
-
 ### Minikube
 
 Start a local Kubernetes cluster.
@@ -101,7 +94,7 @@ CMD ["./pod-restart-notifier"]
 Build docker image
 
 ```bash
-docker build -t <your_dockerhub_username>/pod-restart-notifier-operator:0.1.4 .
+docker build -t <your_dockerhub_username>/pod-restart-notifier-operator:0.1.5 .
 ```
 
 Push the Docker image to a container registry, for example Docker Hub:
@@ -111,7 +104,7 @@ Push the Docker image to a container registry, for example Docker Hub:
 docker login
 
 # Push the versioned image
-docker push <your_dockerhub_username>/pod-restart-notifier-operator:0.1.4
+docker push <your_dockerhub_username>/pod-restart-notifier-operator:0.1.5
 ```
 
 Replace `<your_dockerhub_username>` with your Docker Hub username.
@@ -152,6 +145,8 @@ dependencies: []
 This file will contain default values which users of the chart can override:
 
 ```yaml
+namespace: default
+
 image:
   repository: nonickednn/pod-restart-notifier-operator
   tag: 0.1.5
